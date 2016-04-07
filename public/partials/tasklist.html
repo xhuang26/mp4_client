@@ -1,0 +1,49 @@
+<div class="list" ng-controller='tasklistController'>	
+    <ul class="pagination" role="navigation" aria-label="Pagination">
+      <li class="pagination-previous" ><a ng-click="prev()" aria-label="Next page">Previous <span class="show-for-sr">page</span></a></li>
+        <li id="{{i}}" ng-repeat="i in pageArr"><a href="#/tasklist/{{i}}/{{taskType}}/{{sortby}}" >{{i}}</a></li>
+        
+      <li class="pagination-next"><a ng-click="next()" aria-label="Next page">Next <span class="show-for-sr">page</span></a></li>
+    </ul>
+    
+    <div class="dropdown">
+      <button class="dropbtn">Filter</button>
+      <div class="dropdown-content">
+        <a href="#/tasklist/{{pageNum}}/All/{{sortby}}">All</a>
+        <a href="#/tasklist/{{pageNum}}/Completed/{{sortby}}">Completed</a>
+        <a href="#/tasklist/{{pageNum}}/Pending/{{sortby}}">Pending</a>
+      </div>
+    </div>
+    <div class="dropdown">
+      <button class="dropbtn">Sort By</button>
+      <div class="dropdown-content">
+        <a href="#/tasklist/{{pageNum}}/{{taskType}}/name">name</a>
+        <a href="#/tasklist/{{pageNum}}/{{taskType}}/username">username</a>
+        <a href="#/tasklist/{{pageNum}}/{{taskType}}/dateCreated">dateCreated</a>
+        <a href="#/tasklist/{{pageNum}}/{{taskType}}/deadline">deadline</a>
+      </div>
+    </div>
+	<table>
+      <thead>
+        <tr>
+          <th width="200">Task Name</th>
+          <th width="150">Deadline</th>
+            <th width="150">User</th>
+          <th width="150">Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="task in tasks" ng-click="getDetails(task)">
+          <td>{{task.name}}</td>
+          <td>{{task.deadline}}</td>
+          <td>{{task.assignedUserName}}</td>
+          <td><a href="#" class="button" ng-click="deleteTask(task)">Delete</a></td>
+        </tr>
+        
+      </tbody>
+    </table>
+    
+    
+    
+    
+</div>

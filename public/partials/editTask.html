@@ -1,0 +1,22 @@
+<div class="list" ng-controller='editTaskController'>
+	<form name="submitUser2">
+	  <div class="row">
+          <div class="small-12 columns">
+            <input name="name" ng-model="name" type="text" placeholder="name" required>
+            <input ng-model = "description" type="text" placeholder="description">
+            <input name="deadline" ng-model = "deadline" type="date" placeholder="deadline" required>
+            <select ng-model="assignedUserName">
+                 <option ng-repeat = "user in users" value="{{user.name}}" name="">
+                    {{user.name}}
+                  </option>
+              </select>
+          </div>
+          
+      </div>
+
+    <div class="text-center">
+      <button ng-click="editTask(submitUser2.name.$valid, submitUser2.deadline.$valid)" class="button tiny info">Submit</button>
+    </div>
+
+  </form>
+</div>

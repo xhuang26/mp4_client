@@ -1,7 +1,23 @@
 <div class="list" ng-controller='LlamaListController'>		
-	<ul>
-		<li ng-repeat="llama in llamas">
-			<h3>{{llama.name}}</h3>
-		</li>
-	</ul>
+	<table>
+      <thead>
+        <tr>
+          <th width="200">User Name</th>
+          <th width="150">Email Address</th>
+          <th width="150">Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="llama in llamas" ng-click="getDetails(llama)">
+          <td>{{llama.name}}</td>
+          <td>{{llama.email}}</td>
+          <td><a href="#" class="button" ng-click="deleteUser(llama)">Delete</a></td>
+        </tr>
+        
+      </tbody>
+    </table>
+    
+    
+    
+    
 </div>

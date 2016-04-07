@@ -1,17 +1,28 @@
 <div class="list" ng-controller='FirstController'>
   First Controller
-	<form>
+	<form name="submitUser">
 	  <div class="row">
           <div class="small-12 columns">
-            <input ng-model="data" type="text" placeholder="data">
+              <div class="name-field">
+                    <label>Your name <span style="color: red">*</span> <small class="isrequired">{{displayText1}}</small>
+                        <input name= "name" ng-model="name" type="text" placeholder="name" required>
+                  </label>
+                    
+              </div>
+              <div class="email-field">
+                  <label>Email <span style="color: red">*</span> <small class="isrequired">{{displayText2}}</small>
+                      <input name="email" ng-model = "email" type="email" placeholder="email" required>
+                </label>
+                 
+               </div>
           </div>
       </div>
 
     <div class="text-center">
-      <button ng-click="setData()" class="button tiny info">Set Data</button>
+      <button ng-click="setData(submitUser.name.$valid, submitUser.email.$valid)" class="button tiny info">Set Data</button>
     </div>
-
     {{displayText}}
+    
 
   </form>
 </div>

@@ -1,12 +1,39 @@
 <div class="list" ng-controller='SecondController'>    
-  Second Controller
-  <form>
-
-    <div class="text-center">
-      <button ng-click="getData()" class="button tiny info">Get Data</button>
+    <div id="user">
+          <div class="small-offset-1">
+          <h4>User Profile<small>  check your personal file</small></h4>
+          </div>
+          <hr>
+          <div class="row content">
+              <div class="column small-offset-1 small-5 large-offset-0 large-6"><h5>{{name}}</h5></div>
+              <div class="column small-6"><h5>{{email}}</h5></div>
+          </div>
+          <hr>
+     </div>
+     <div id="task">
+         <div class="small-offset-1">
+            <h4>Tasks<small>  All your future tasks here</small></h4>
+        </div>
+        <div class="small-offset-1">
+            <button ng-click="loadPendingTasks()" class="button tiny info">Pending</button>
+            <button ng-click="loadCompleteTasks()" class="button tiny info">Complete</button>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="small-12 columns small-centered" ng-repeat="task in pendingTasks">
+                {{task}}
+                <article class="event">
+                    <div class="event-date">
+                      <p class="event-month">{{task.deadline|date:'MMM, yyyy'}}</p>
+                      <p class="event-day">{{task.deadline|date:'d'}}</p>
+                    </div>
+                    <div class="event-desc">
+                      <h4 class="event-desc-header" ng-click="getDetails(task)">{{task.name}}</h4>
+                      <a class="rsvp button" ng-click="setCompleted(task)">Complete</a>
+                    </div>
+                </article>
+                <hr>
+            </div>
+         </div>
     </div>
-
-    {{data}}
-
-  </form>
 </div>

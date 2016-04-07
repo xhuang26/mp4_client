@@ -1,0 +1,22 @@
+<div class="list" ng-controller='taskdetailsController'>
+    <div id="user">
+          <div class="small-offset-1">
+          <h4>Task Details</h4>
+          </div>
+          <div class="small-offset-1">
+                <a ng-click="gotoEditTask()" class="button" ng-click="editTask()">Edit</a>
+          </div>
+          <hr>
+          <div class="row content">
+              <div class="column small-offset-1 small-5 large-offset-0 large-6"><h4>Task Name: {{data.name}}</h4></div>
+              <div class="column small-12"><h5>Time Created: {{data.dateCreated | date: "medium"}}</h5></div>
+              <div class="column small-12"><h5>Deadline: {{data.deadline | date: "medium"}}</h5></div>
+              <div class="column small-12"><h6>User Name: {{data.assignedUserName}}</h6></div>
+              <div class="column small-12">Description: {{data.description}}</div>
+              <hr>
+              
+              
+          </div>
+          
+     </div>
+</div>

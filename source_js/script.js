@@ -1,4 +1,7 @@
 var divs = document.getElementsByClassName('alert');
+
+
+
 for(var i=0; i<divs.length; i++) {
   divs[i].addEventListener("click", highlightThis);
   /*
@@ -14,3 +17,8 @@ function highlightThis(event) {
     alert(this.className);
     this.style.backgroundColor=backgroundColor;
 }
+
+
+
+
+

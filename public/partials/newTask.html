@@ -1,0 +1,25 @@
+<div class="list" ng-controller='newTaskController'>
+	<form name="submitUser1">
+	  <div class="row">
+          <div class="small-12 columns">
+            <span style="color: red;">*</span>
+            <input name="name" ng-model="name" type="text" placeholder="name" required />
+            <input ng-model = "description" type="text" placeholder="description" />
+            <span style="color: red;">*</span>
+            <input name="deadline" ng-model = "deadline" type="date" placeholder="deadline" />
+            <select ng-model="assignedUserName">
+                 <option ng-repeat = "user in users" value="{{user.name}}" name="">
+                    {{user.name}}
+                  </option>
+              </select>
+          </div>
+          
+      </div>
+
+    <div class="text-center">
+      <button ng-click="addTask(submitUser1.name.$valid, submitUser1.deadline.$valid)" class="button tiny info">Submit</button>
+    </div>
+    {{displayText1}}
+    {{displayText2}}
+  </form>
+</div>
