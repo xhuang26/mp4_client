@@ -9,13 +9,24 @@
           <hr>
           <div class="row content">
               <div class="column small-offset-1 small-5 large-offset-0 large-6"><h4>Task Name: {{data.name}}</h4></div>
-              <div class="column small-12"><h5>Time Created: {{data.dateCreated | date: "medium"}}</h5></div>
-              <div class="column small-12"><h5>Deadline: {{data.deadline | date: "medium"}}</h5></div>
-              <div class="column small-12"><h6>User Name: {{data.assignedUserName}}</h6></div>
-              <div class="column small-12">Description: {{data.description}}</div>
-              <hr>
+              <div  class="column small-offset 1 small-3" >
+                <div class="small-12">
+                    completion status: 
+                </div>
+                <select class="small-12" ng-model="completed">
+                 <option  value="true" name="">completed</option>
+                 <option value="false" name="">pending</option>
+               </select>
+                <div  class="small-12" >
+                  <a class='button' ng-click="setCompletion()">set</a>
+                </div>
+              </div>
               
-              
+              <div class="column small-offset-1 small-11"><h5>Time Created: {{data.dateCreated | date: "medium"}}</h5></div>
+              <div class="column small-offset-1 small-11"><h5>Deadline: {{data.deadline | date: "medium"}}</h5></div>
+              <div class="column small-offset-1 small-11"><h6>User Name: {{data.assignedUserName}}</h6></div>
+              <div class="column small-offset-1 small-11">Description: {{data.description}}</div>
+              <hr>     
           </div>
           
      </div>
