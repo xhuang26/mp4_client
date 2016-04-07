@@ -81,19 +81,22 @@ mp4Controllers.controller('SecondController', ['$scope', '$filter', '$location',
             console.log(data);
             
         });
-        
+        var tasks = "";
+        var array = [];
+        var taskStr="";
         //update pendingTaskList
-        var tasks = $scope.data['pendingTasks'][0];
-        //console.log("original tasks: ----");
-        console.log($scope.data);
-        console.log(tasks);
+        if($scope.data['pendingTasks'].length !== 0){
+            tasks = $scope.data['pendingTasks'][0];
+            //console.log("original tasks: ----");
+            console.log($scope.data);
+            console.log(tasks);
         
-        var array = tasks.slice(1,-1);
-        //console.log(array);
-        array = array.split(',');
-        //console.log("array----");
-        //console.log(array);
-            var taskStr="";
+            var array = tasks.slice(1,-1);
+            //console.log(array);
+            array = array.split(',');
+            //console.log("array----");
+            //console.log(array);
+            
             for(i=0; i<array.length; i++){
                 var temp = array[i];
                 //console.log("last: "+ temp[temp.length-1]);
@@ -111,29 +114,33 @@ mp4Controllers.controller('SecondController', ['$scope', '$filter', '$location',
             array = jQuery.grep(array, function(value){
                 return value != tempStr; 
             });
-            //console.log(array);
-            if(array.length !== 0){
-                for(i=0; i<array.length; i++){
-                    var temp1 = "'"+array[i];
-                    if(i != array.length-1)
-                        temp1 = temp1+"', ";
-                    else
-                        temp1 = temp1 + "'";
-                    taskStr = taskStr + temp1;
-                }  
-                //console.log("["+taskStr+"]");
-                var newTasks = [];
-                newTasks.push(taskStr);
-            }else{
-                var newTasks = [];
-            }
-            //console.log(newTasks);
-            Llamas.modifyTask($scope.data["_id"], $scope.data["email"], $scope.data["name"], $scope.data["dateCreated"], newTasks).success(function(data){
-                console.log("modified");
-                Tasks.getCompletedTasksOneUser($scope.data["_id"]).success(function(data){
-                   $scope.pendingTasks = data['data'];   
-                });
+        }
+        
+        //console.log(array);
+        if(array.length !== 0){
+            for(i=0; i<array.length; i++){
+                var temp1 = "'"+array[i];
+                if(i != array.length-1)
+                    temp1 = temp1+"', ";
+                else
+                    temp1 = temp1 + "'";
+                taskStr = taskStr + temp1;
+            }  
+            //console.log("["+taskStr+"]");
+            var newTasks = [];
+            newTasks.push(taskStr);
+        }else{
+            var newTasks = [];
+        }
+        //console.log(newTasks);
+        Llamas.modifyTask($scope.data["_id"], $scope.data["email"], $scope.data["name"], $scope.data["dateCreated"], newTasks).success(function(data){
+            console.log("modified");
+            CommonData.setData(data['data']);
+            $scope.data = CommonData.getData();
+            Tasks.getCompletedTasksOneUser($scope.data["_id"]).success(function(data){
+               $scope.pendingTasks = data['data'];   
             });
+        });
             
     }
     $scope.loadCompleteTasks = function(){
@@ -163,6 +170,7 @@ mp4Controllers.controller('SecondController', ['$scope', '$filter', '$location',
 //taskdetails
 mp4Controllers.controller('taskdetailsController', ['$scope', '$filter', '$location', 'CommonData', 'Tasks', 'Llamas', function($scope, $filter, $location, CommonData, Tasks, Llamas) {
     $scope.data = CommonData.getData();
+    console.log($scope.data);
     var taskid = $scope.data['_id'];
     var assignedUser = $scope.data['assignedUser'];
     var oldCompletion = $scope.data['completed'];
@@ -175,121 +183,132 @@ mp4Controllers.controller('taskdetailsController', ['$scope', '$filter', '$locat
         if($scope.completed === "true")
             var temp = true;
         else
-            var temp = false
-        Tasks.modifyTask(taskid, $scope.data['name'], $scope.data['description'], temp, $scope.data['assignedUser'], $scope.data['assignedUserName']).success(function(data){
-        
-           CommonData.setData(data['data']);
-           $scope.data = CommonData.getData();
-           console.log("task modified");
-           console.log(data); 
+            var temp = false;
+        //id, myname, des, deadline, ifcompleted, user, userName
+        console.log($scope.data['assignedUser']);
+        console.log($scope.data['assignedUserName']);
+        Tasks.modifyTask(taskid, $scope.data['name'], $scope.data['description'], $scope.data['deadline'], temp, $scope.data['assignedUser'], $scope.data['assignedUserName']).success(function(data){
+            console.log("task modified");
+            console.log(data);
+            CommonData.setData(data['data']);
+            $scope.data = CommonData.getData();
+           
             //delete the task from user's pending task if it's completed
             if(assignedUser !== "" && $scope.completed === 'true'){
-            Llamas.getOneUser(assignedUser).success(function(data){
-                var user = $scope.data['data'];
-                var tasks = user['pendingTasks'][0];
-                var taskStr="";
-                var array = [];
-                if(tasks !== undefined){
-                    array = tasks.slice(1,-1);
-                    //console.log(array);
-                    array = array.split(',');
-                    console.log("array----");
-                    console.log(array);
-
-                    for(i=0; i<array.length; i++){
-                        var temp = array[i];
-                        //console.log(temp2);
-                        //console.log("last: "+ temp2[temp2.length-1]);
-                        if(temp[temp.length-1] == "'"){
-                            console.log("get here");
-                            array[i] = array[i].slice(0,-1);
-                        }
-                        if(array[i][0] == " ")
-                            array[i] = array[i].slice(1, temp.length);
-                        if(array[i][0] == "'"){
-                            array[i] = array[i].slice(1,temp.length);
-                        }   
-                    }
-                    var tempStr = taskid;
-                    console.log("tempStr: "+tempStr);
-                    console.log("array for checking: ------")
-                    console.log(array);
-                    array = jQuery.grep(array, function(value){
-                         return value != tempStr; 
-                    });
-                    console.log("new array: ");
-                    console.log(array);
-                    if(array.length !== 0){
-                        
-                        console.log("array is not empty");
-                        for(i=0; i<array.length; i++){
-                            var temp = "'"+array[i];
-                            if(i != array.length-1)
-                                temp = temp+"', ";
-                            else
-                                temp = temp + "'";
-                            taskStr = taskStr + temp;
-                        } 
-                        var newTasks = [];
-                        newTasks.push(taskStr);
-                    }else{
-                        console.log("array is empty");
-                        var newTasks = [];
-                    }
-                    console.log("changed pendingTasks for old user" + newTasks);
-                    Llamas.modifyTask(user["_id"], user["email"], user["name"], user["dateCreated"], newTasks).success(function(data){
-                            
-                            console.log("modified");
-                    });      
-                }
-            });
-        }
-            //add the task to user's pending task if completed
-            else if(assignedUser !== "" && $scope.completed === 'false' && $scope.completed !== oldCompletion){
-                var user = $scope.data['data'];
-                var tasks = user['pendingTasks'][0];
-                var taskStr="";
-                var array = [];
-                if(tasks !== undefined){
-                    array = tasks.slice(1,-1);
-                    //console.log(array);
-                    array = array.split(',');
-                    //console.log("array----");
-                    //console.log(array);
-                    for(i=0; i<array.length; i++){
-                        var temp = array[i];
-                            //console.log("last: "+ temp[temp.length-1]);
-                        if(temp[temp.length-1] == "'"){
-                            array[i] = array[i].slice(0,-1);
-                        }
-                        if(array[i][0] == " ")
-                            array[i] = array[i].slice(1, temp.length);
-                        if(array[i][0] == "'"){
-                            array[i] = array[i].slice(1,temp.length);
-                        }   
-                    }
-                }
-                array.push(taskid);
-                if(array.length !== 0){
+                Llamas.getOneUser(assignedUser).success(function(data){
+                    console.log("it's completed");
+                    var user = data['data'];
+                    var tasks = "";
                     var taskStr="";
-                    for(i=0; i<array.length; i++){
-                        var temp1 = "'"+array[i];
-                        if(i != array.length-1)
-                            temp1 = temp1+"', ";
-                        else
-                            temp1 = temp1 + "'";
-                        taskStr = taskStr + temp1;
-                    } 
-                    var newTasks = [];
-                    newTasks.push(taskStr);
-                }else{
-                    var newTasks = [];
-                }
-                Llamas.modifyTask($scope.assignedUser, $scope.user["email"], $scope.user["name"], $scope.user["dateCreated"], newTasks).success(function(data){
-                    console.log("modified");
-                });    
+                    var array = [];
+                    if(user['pendingTasks'].length !== 0){
+                        tasks = user['pendingTasks'][0];
+                        array = tasks.slice(1,-1);
+                        //console.log(array);
+                        array = array.split(',');
+                        console.log("array----");
+                        console.log(array);
+
+                        for(i=0; i<array.length; i++){
+                            var temp = array[i];
+                            //console.log(temp2);
+                            //console.log("last: "+ temp2[temp2.length-1]);
+                            if(temp[temp.length-1] == "'"){
+                                console.log("get here");
+                                array[i] = array[i].slice(0,-1);
+                            }
+                            if(array[i][0] == " ")
+                                array[i] = array[i].slice(1, temp.length);
+                            if(array[i][0] == "'"){
+                                array[i] = array[i].slice(1,temp.length);
+                            }   
+                        }
+                        var tempStr = taskid;
+                        console.log("tempStr: "+tempStr);
+                        console.log("array for checking: ------")
+                        console.log(array);
+                        array = jQuery.grep(array, function(value){
+                             return value != tempStr; 
+                        });
+                        console.log("new array: ");
+                        console.log(array);
+                        if(array.length !== 0){
+
+                            console.log("array is not empty");
+                            for(i=0; i<array.length; i++){
+                                var temp = "'"+array[i];
+                                if(i != array.length-1)
+                                    temp = temp+"', ";
+                                else
+                                    temp = temp + "'";
+                                taskStr = taskStr + temp;
+                            } 
+                            var newTasks = [];
+                            newTasks.push(taskStr);
+                        }else{
+                            console.log("array is empty");
+                            var newTasks = [];
+                        }
+                        console.log("changed pendingTasks for old user" + newTasks);
+                        Llamas.modifyTask(user["_id"], user["email"], user["name"], user["dateCreated"], newTasks).success(function(data){
+
+                                console.log("modified");
+                        });      
+                    }
+                });
+            }
+            //add the task to user's pending task if completed
+            else if(assignedUser !== "" && $scope.completed === 'false' && oldCompletion !== false){
+                Llamas.getOneUser(assignedUser).success(function(data){
+                        console.log("it's pending");
+                        var user = data['data'];
+                        console.log(user['pendingTasks'].length);
+                        var tasks = undefined;
+                        var taskStr="";
+                        var array = [];
+                        if(user['pendingTasks'].length !== 0){
+                            tasks = user['pendingTasks'][0];
+                            array = tasks.slice(1,-1);
+                            //console.log(array);
+                            array = array.split(',');
+                            //console.log("array----");
+                            //console.log(array);
+                            for(i=0; i<array.length; i++){
+                                var temp = array[i];
+                                    //console.log("last: "+ temp[temp.length-1]);
+                                if(temp[temp.length-1] == "'"){
+                                    array[i] = array[i].slice(0,-1);
+                                }
+                                if(array[i][0] == " ")
+                                    array[i] = array[i].slice(1, temp.length);
+                                if(array[i][0] == "'"){
+                                    array[i] = array[i].slice(1,temp.length);
+                                }   
+                            }
+                        }
+                        array.push(taskid);
+                        if(array.length !== 0){
+                            var taskStr="";
+                            for(i=0; i<array.length; i++){
+                                var temp1 = "'"+array[i];
+                                if(i != array.length-1)
+                                    temp1 = temp1+"', ";
+                                else
+                                    temp1 = temp1 + "'";
+                                taskStr = taskStr + temp1;
+                            } 
+                            var newTasks = [];
+                            newTasks.push(taskStr);
+                        }else{
+                            var newTasks = [];
+                        }
+                        Llamas.modifyTask(assignedUser, user["email"], user["name"], user["dateCreated"], newTasks).success(function(data){
+                            console.log("modified");
+                        });    
+                });
             }
             oldCompletion = $scope.data['completed'];
+            console.log("oldCompletion: " + oldCompletion);
         });
         
     }
@@ -445,31 +464,36 @@ mp4Controllers.controller('tasklistController',['$scope', '$route', '$routeParam
             Llamas.getOneUser(userid).success(function(data){
                 var user = data['data'];
                 console.log(user);
-                var tasks = user['pendingTasks'][0];
-                var array = tasks.slice(1,-1);
-                console.log(array);
-                array = array.split(',');
-                //console.log("array----");
-                //console.log(array);
+                var tasks = "";
                 var taskStr="";
-                for(i=0; i<array.length; i++){
-                    var temp = array[i];
-                    //console.log("last: "+ temp[temp.length-1]);
-                    if(temp[temp.length-1] == "'"){
-                        array[i] = array[i].slice(0,-1);
+                var array = [];
+                if(user['pendingTasks'].length !== 0){
+                    tasks = user['pendingTasks'][0];
+                    array = tasks.slice(1,-1);
+                    console.log(array);
+                    array = array.split(',');
+                    //console.log("array----");
+                    //console.log(array);
+                
+                    for(i=0; i<array.length; i++){
+                        var temp = array[i];
+                        //console.log("last: "+ temp[temp.length-1]);
+                        if(temp[temp.length-1] == "'"){
+                            array[i] = array[i].slice(0,-1);
+                        }
+                        if(array[i][0] == " ")
+                            array[i] = array[i].slice(1, temp.length);
+                        if(array[i][0] == "'"){
+                            array[i] = array[i].slice(1,temp.length);
+                        }   
                     }
-                    if(array[i][0] == " ")
-                        array[i] = array[i].slice(1, temp.length);
-                    if(array[i][0] == "'"){
-                        array[i] = array[i].slice(1,temp.length);
-                    }   
+                    console.log(array);
+                    var tempStr = id;
+                    array = jQuery.grep(array, function(value){
+                        return value != tempStr; 
+                    });
+                    console.log(array);
                 }
-                console.log(array);
-                var tempStr = id;
-                array = jQuery.grep(array, function(value){
-                    return value != tempStr; 
-                });
-                console.log(array);
                 if(array.length !== 0){
                     for(i=0; i<array.length; i++){
                         var temp1 = "'"+array[i];
@@ -509,7 +533,7 @@ mp4Controllers.controller('newTaskController', ['$scope', 'Tasks', 'Llamas', '$f
     $scope.assignedUserName = undefined;
     $scope.displayText1 = "";
     $scope.displayText2 = "";
-    var tasks = "";
+    $scope.tasks = [];
     Llamas.get().success(function(data){
        $scope.users = data['data']; 
         console.log($scope.users);
@@ -547,9 +571,9 @@ mp4Controllers.controller('newTaskController', ['$scope', 'Tasks', 'Llamas', '$f
                     $scope.assignedUser = user['_id'];
                     $scope.user = user;
                     //console.log("founded!");
-                    tasks = user["pendingTasks"][0];
-                    //console.log("current pendingTasks: ------------");
-                    //console.log(tasks);
+                    $scope.tasks = user["pendingTasks"];
+                    console.log("current pendingTasks: ------------");
+                    console.log($scope.tasks);
                 }
             });
         }
@@ -564,8 +588,10 @@ mp4Controllers.controller('newTaskController', ['$scope', 'Tasks', 'Llamas', '$f
                 var taskid = data['data']['_id'];
                 
                 var array = [];
-                if(tasks !== undefined){
-                    array = tasks.slice(1,-1);
+                console.log($scope.tasks);
+                if($scope.tasks.length !== 0){
+                    $scope.tasks = $scope.tasks[0];
+                    array = $scope.tasks.slice(1,-1);
                     //console.log(array);
                     array = array.split(',');
                     //console.log("array----");
@@ -608,7 +634,7 @@ mp4Controllers.controller('newTaskController', ['$scope', 'Tasks', 'Llamas', '$f
                 Llamas.modifyTask($scope.assignedUser, $scope.user["email"], $scope.user["name"], $scope.user["dateCreated"], newTasks).success(function(data){
                     console.log("modified");
                     Llamas.get().success(function(data){
-                    $scope.users = data['data']; 
+                        $scope.users = data['data']; 
                         //console.log($scope.users);
                     });
                 });    
@@ -640,8 +666,8 @@ mp4Controllers.controller('editTaskController', ['$scope', 'Tasks', 'Llamas', '$
     $scope.olduser = "";
     $scope.user = "";
     $scope.assignedUserName = undefined;
-    var tasks = "";
-    var tasks2 = "";
+    $scope.tasks = [];
+    $scope.tasks2 = [];
     $scope.editTask = function(n, d){
         if(!n){
             console.log("name");
@@ -672,16 +698,16 @@ mp4Controllers.controller('editTaskController', ['$scope', 'Tasks', 'Llamas', '$
                     $scope.assignedUser = user['_id'];
                     $scope.user = user;
                     //console.log("founded!");
-                    tasks = user["pendingTasks"][0];
+                    $scope.tasks = user["pendingTasks"];
                     console.log("new user's pending tasks");
-                    console.log(tasks);
+                    console.log($scope.tasks);
                 }
                 //old user
                 if(user['name'] === $scope.data['assignedUserName']){
                     $scope.olduser = user;
-                    tasks2 = user["pendingTasks"][0];
+                    $scope.tasks2 = user["pendingTasks"];
                     console.log("old user's pending tasks");
-                    console.log(tasks2);
+                    console.log($scope.tasks2);
                 }
             });
         }
@@ -697,8 +723,10 @@ mp4Controllers.controller('editTaskController', ['$scope', 'Tasks', 'Llamas', '$
                     console.log("add to new user: --------------------");
                     var taskStr="";
                     var array = [];
-                    if(tasks !== undefined){
-                        array = tasks.slice(1,-1);
+                    
+                    if($scope.tasks.length !== 0){
+                        $scope.tasks = $scope.tasks[0];
+                        array = $scope.tasks.slice(1,-1);
                         //console.log(array);
                         array = array.split(',');
                         //console.log("array----");
@@ -747,6 +775,7 @@ mp4Controllers.controller('editTaskController', ['$scope', 'Tasks', 'Llamas', '$
                            $scope.users = data['data']; 
                             console.log($scope.users);
                         });
+                        $scope.data = CommonData.getData();
                         $scope.displayText1 = "";
                         $scope.displayText2 = "";
                         $scope.name = $scope.data['name'];
@@ -764,8 +793,9 @@ mp4Controllers.controller('editTaskController', ['$scope', 'Tasks', 'Llamas', '$
                         console.log("change old user-----------------");
                         var taskStr2="";
                         var array2 = [];
-                        if(tasks2 !== undefined){
-                            array2 = tasks2.slice(1,-1);
+                        if($scope.tasks2.length !== 0){
+                            $scope.tasks2 = $scope.tasks2[0];
+                            array2 = $scope.tasks2.slice(1,-1);
                             //console.log(array);
                             array2 = array2.split(',');
                             console.log("array----");
@@ -816,6 +846,7 @@ mp4Controllers.controller('editTaskController', ['$scope', 'Tasks', 'Llamas', '$
                                        $scope.users = data['data']; 
                                         console.log($scope.users);
                                     });
+                                    $scope.data = CommonData.getData();
                                     $scope.displayText1 = "";
                                     $scope.displayText2 = "";
                                     $scope.name = $scope.data['name'];
@@ -824,8 +855,8 @@ mp4Controllers.controller('editTaskController', ['$scope', 'Tasks', 'Llamas', '$
                                     $scope.olduser = "";
                                     $scope.user = "";
                                     $scope.assignedUserName = undefined;
-                                    var tasks = "";
-                                    var tasks2 = "";
+                                    $scope.tasks = "";
+                                    $scope.tasks2 = "";
                             });
                         }
                         
@@ -834,7 +865,7 @@ mp4Controllers.controller('editTaskController', ['$scope', 'Tasks', 'Llamas', '$
                 
                 
             }
-           
+            
             
         });
         
@@ -865,40 +896,43 @@ mp4Controllers.controller('LlamaListController', ['$scope', '$http', '$location'
             console.log($scope.pendingTasks);
             //console.log("original tasks: ----");
             //console.log($scope.data);
-
-            var array = tasks[0].slice(1,-1);
-            //console.log(array);
-            array = array.split(',');
-            //console.log("array----");
-            //console.log(array);
-            var taskStr="";
-            for(i=0; i<array.length; i++){
-                var temp = array[i];
+            var array = [];
+            if(tasks.length !== 0){
+                array = tasks[0].slice(1,-1);
+                //console.log(array);
+                array = array.split(',');
+                //console.log("array----");
+                //console.log(array);
+                var taskStr="";
+                for(i=0; i<array.length; i++){
+                    var temp = array[i];
                     //console.log("last: "+ temp[temp.length-1]);
-                if(temp[temp.length-1] == "'"){
-                    array[i] = array[i].slice(0,-1);
+                    if(temp[temp.length-1] == "'"){
+                        array[i] = array[i].slice(0,-1);
+                    }
+                    if(array[i][0] == " ")
+                        array[i] = array[i].slice(1, temp.length);
+                    if(array[i][0] == "'"){
+                        array[i] = array[i].slice(1,temp.length);
+                    }   
                 }
-                if(array[i][0] == " ")
-                    array[i] = array[i].slice(1, temp.length);
-                if(array[i][0] == "'"){
-                    array[i] = array[i].slice(1,temp.length);
-                }   
-            }
-            console.log(array);
-            i=0;
             
-           $scope.loopfunc = function(i){
-                if(i < array.length){
-                    console.log(array[i]);
-                    console.log($scope.pendingTasks[i]);
-                    Tasks.setAssignedUserNone(array[i],$scope.pendingTasks[i]).success(function(data){
-                       i = i+1;
-                        console.log(i);
-                       $scope.loopfunc(i);
-                    });
+                console.log(array);
+                i=0;
+                
+                $scope.loopfunc = function(i){
+                    if(i < array.length){
+                        console.log(array[i]);
+                        console.log($scope.pendingTasks[i]);
+                        Tasks.setAssignedUserNone(array[i],$scope.pendingTasks[i]).success(function(data){
+                            i = i+1;
+                            console.log(i);
+                            $scope.loopfunc(i);
+                        });
+                    }
                 }
+                $scope.loopfunc(i);
             }
-           $scope.loopfunc(i);
            Llamas.deleteUser(llama["_id"]).success(function(data){
               $location.path("llamalist"); 
            });

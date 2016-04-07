@@ -74,8 +74,9 @@ mp4Services.factory('Tasks', function($http, $window) {
                 description: des,
                 deadline: deadline,
                 completed: ifcompleted,
-                assignedUser: user,
-                assignedUserName: userName
+                assignedUserName: userName,
+                assignedUser: user
+                
             });
         },
         gettaskSet: function(list){
