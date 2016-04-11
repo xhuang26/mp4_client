@@ -10,25 +10,25 @@ mp4Controllers.controller('FirstController', ['$scope', 'CommonData', 'Llamas', 
    $scope.llamas = [];
    
    $scope.setData = function(n, e){
-        console.log("set data");
+        //console.log("set data");
         var  error = 0;
         if(!n && e){
-            console.log("no name");
+            //console.log("no name");
             $scope.displayText1 = "Name is required";
             $scope.displayText2 = "";
         }
         else if(!e && n){
-            console.log("no email");
+            //console.log("no email");
             $scope.displayText1 = "";
             $scope.displayText2 = "Email is required";
         }
        else if(!e && ! n){
-           console.log("no both");
+           //console.log("no both");
             $scope.displayText1 = "Name is required";  
            $scope.displayText2 = "Email is required";
         }
        else if(n && e){
-            Llamas.get().success(function(data){
+            /*Llamas.get().success(function(data){
                     $scope.llamas = data['data'];
                     console.log($scope.llamas);
                     angular.forEach($scope.llamas, function(obj){
@@ -60,7 +60,16 @@ mp4Controllers.controller('FirstController', ['$scope', 'CommonData', 'Llamas', 
                             $scope.displayText2 = "";
                     }
                     
-              });
+              });*/
+           $scope.displayText1 = "";
+            $scope.displayText2 = "";
+           Llamas.postNewUser($scope.name, $scope.email, []).success(function(data){
+                //console.log(data); 
+                
+           }).error(function(data){
+                //console.log(data); 
+               $scope.displayText = data['message'];
+           });
        }
    }
    
@@ -75,13 +84,14 @@ mp4Controllers.controller('SecondController', ['$scope', '$filter', '$location',
     $scope.$on('$viewContentLoaded', function(){
         console.log("reload the page");
         $scope.data = CommonData.getUser();
-        console.log($scope.data);
+        //console.log($scope.data);
         $scope.email = $scope.data['email'];
         $scope.name = $scope.data['name'];  
         $scope.pendingTasks = [];
         $scope.buttonvalue = true;
         $scope.savedTasks = $scope.pendingTasks;
-        console.log("per user: -----------------");
+        $scope.displayText = "";
+        //console.log("per user: -----------------");
         var curr;
         if($scope.data !== undefined){
             curr = $scope.data['pendingTasks'];
@@ -633,6 +643,7 @@ mp4Controllers.controller('newTaskController', ['$scope', 'Tasks', 'Llamas', '$f
     $scope.assignedUserName = undefined;
     $scope.displayText1 = "";
     $scope.displayText2 = "";
+    $scope.displayText = "Please add new task";
     $scope.tasks = [];
     Llamas.get().success(function(data){
        $scope.users = data['data']; 
@@ -641,6 +652,7 @@ mp4Controllers.controller('newTaskController', ['$scope', 'Tasks', 'Llamas', '$f
     
     console.log($scope.assignedUserName);
     $scope.addTask = function(n,d){
+        $scope.displayText = "Please add new task";
         console.log(n +", " + $scope.deadline);
         if(!n){
             console.log("name");
@@ -684,7 +696,7 @@ mp4Controllers.controller('newTaskController', ['$scope', 'Tasks', 'Llamas', '$f
         Tasks.postNewTask($scope.name, $scope.description, deadlineFormatted, false, $scope.assignedUser, $scope.assignedUserName).success(function(data){
             console.log("posted");
             console.log(data);
-            
+            $scope.displayText = "Data Set";
             if($scope.assignedUser !== ""){
                 var taskid = data['data']['_id'];
                 
