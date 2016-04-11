@@ -1,13 +1,20 @@
 var mp4Services = angular.module('mp4Services', []);
 
 mp4Services.factory('CommonData', function(){
-    var data = "";
+    var user = "";
+    var task = "";
     return{
         getData : function(){
-            return data;
+            return task;
         },
         setData : function(newData){
-            data = newData;
+            task = newData;
+        },
+        getUser : function(){
+            return user;
+        },
+        setUser: function(newData){
+            user = newData;
         }
         
     }
@@ -67,6 +74,8 @@ mp4Services.factory('Tasks', function($http, $window) {
             });
         },
         modifyTask: function(id, myname, des, deadline, ifcompleted, user, userName){
+             console.log("inside modifyTask");
+             console.log(userName);
              var baseUrl = $window.sessionStorage.baseurl;
              var curr = baseUrl+'/api/tasks/'+id;
              return $http.put(curr, {
@@ -74,8 +83,9 @@ mp4Services.factory('Tasks', function($http, $window) {
                 description: des,
                 deadline: deadline,
                 completed: ifcompleted,
-                assignedUserName: userName,
-                assignedUser: user
+                assignedUser: user,
+                assignedUserName: userName
+                
                 
             });
         },
@@ -87,9 +97,17 @@ mp4Services.factory('Tasks', function($http, $window) {
             return $http.get(curr);
         },
         getCompletedTasksOneUser: function(id){
-            //http://www.uiucwp.com:4000/api/tasks?where={"completed": true, "_id": "adsfs"}
+            //http://www.uiucwp.com:4000/api/tasks?where={"completed": true, "assignedUser": "adsfs"}
             var baseUrl = $window.sessionStorage.baseurl;
             var curr = baseUrl+'/api/tasks?where={"completed":"true","assignedUser":"'+id+'"}';
+            console.log(curr);
+            return $http.get(curr);
+        },
+        getAllTasksOneUser: function(id){
+            //http://www.uiucwp.com:4000/api/tasks?where={"assignedUser": "adsfs"}
+            var baseUrl = $window.sessionStorage.baseurl;
+            var curr = baseUrl+'/api/tasks?where={"assignedUser":"'+id+'"}';
+            console.log("inside getalltask");
             console.log(curr);
             return $http.get(curr);
         },
@@ -126,6 +144,7 @@ mp4Services.factory('Tasks', function($http, $window) {
                 assignedUserName: "unassigned"
             });
         }
+        
         
         
     }

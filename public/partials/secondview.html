@@ -21,7 +21,6 @@
         <hr>
         <div class="row">
             <div class="small-12 columns small-centered" ng-repeat="task in pendingTasks">
-                {{task}}
                 <article class="event">
                     <div class="event-date">
                       <p class="event-month">{{task.deadline|date:'MMM, yyyy'}}</p>
@@ -29,7 +28,7 @@
                     </div>
                     <div class="event-desc">
                       <h4 class="event-desc-header" ng-click="getDetails(task)">{{task.name}}</h4>
-                      <a class="rsvp button" ng-click="setCompleted(task)">Complete</a>
+                      <a ng-show="buttonvalue" class="rsvp button" ng-click="setCompleted(task)">Complete</a>
                     </div>
                 </article>
                 <hr>
