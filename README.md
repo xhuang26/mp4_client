@@ -1,4 +1,5 @@
-# Starter files for MP4
+# Task Manager Client
+this is the server side for the task manager. This porject support team task managents with functionalities like assign/reassign task to user, change completion status of the task, view task or users by different orders, check each user's task and related info and etc.
 
 ## Setup
 Use the following commands in your vagrant development environment to get this up and running
